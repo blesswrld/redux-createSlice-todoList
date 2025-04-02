@@ -1,5 +1,6 @@
-import { createStore } from "redux";
-import { nanoid, createSlice } from "@reduxjs/toolkit";
+// import { createStore } from "redux";
+import { nanoid, createSlice, configureStore } from "@reduxjs/toolkit";
+import logger from "redux-logger";
 
 const todoSlice = createSlice({
     name: "@@todos",
@@ -31,4 +32,14 @@ const todoSlice = createSlice({
 
 export const { addTodo, removeTodo, toggleTodo } = todoSlice.actions;
 
-export const store = createStore(todoSlice.reducer);
+export const store = configureStore({
+    reducer: todoSlice.reducer,
+    // reducer: {
+    //     todos: todoSlice.reducer,
+    // },
+    // включаем расширение для redux devtools
+    devTools: true,
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+    // preloadedState: [{ id: 1, title: "Redux", completed: true }],
+    // enhancers: [],
+});
