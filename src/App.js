@@ -1,6 +1,8 @@
 import { useSelector, useDispatch } from "react-redux";
 import { addTodo, removeTodo, toggleTodo } from "./store";
 
+import "./App.css";
+
 export default function App() {
     return (
         <div className="App">

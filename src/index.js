@@ -4,6 +4,8 @@ import { store } from "./store";
 
 import App from "./App";
 
+import "./index.css";
+
 const rootElement = document.getElementById("root");
 ReactDOM.render(
     <Provider store={store}>
