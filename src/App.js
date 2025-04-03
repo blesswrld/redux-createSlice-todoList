@@ -1,5 +1,12 @@
 import { useSelector, useDispatch } from "react-redux";
-import { addTodo, removeTodo, toggleTodo } from "./store";
+import {
+    addTodo,
+    removeTodo,
+    resetToDefault,
+    selectVisibleTodos,
+    setFilter,
+    toggleTodo,
+} from "./store";
 
 import "./App.css";
 
@@ -8,10 +15,18 @@ export default function App() {
         <div className="App">
             <h1>Hello Redux Todo</h1>
             <NewTodo />
+            <FilterTodo />
             <TodoList />
+            <ResetApp />
         </div>
     );
 }
+
+const ResetApp = () => {
+    const dispatch = useDispatch();
+
+    return <button onClick={() => dispatch(resetToDefault())}>Reset</button>;
+};
 
 const NewTodo = () => {
     const dispatch = useDispatch();
@@ -31,7 +46,10 @@ const NewTodo = () => {
 };
 
 const TodoList = () => {
-    const todos = useSelector((state) => state);
+    const activeFilter = useSelector((state) => state.filter);
+    const todos = useSelector((state) =>
+        selectVisibleTodos(state, activeFilter)
+    );
     const dispatch = useDispatch();
 
     return (
@@ -50,5 +68,47 @@ const TodoList = () => {
                 </li>
             ))}
         </ul>
+    );
+};
+
+const FilterTodo = () => {
+    const dispatch = useDispatch();
+    const activeFilter = useSelector((state) => state.filter);
+
+    const handleFilter = (val) => dispatch(setFilter(val));
+
+    return (
+        <div>
+            <button
+                style={{
+                    backgroundColor:
+                        activeFilter === "all" ? "black" : "lightgray",
+                    marginTop: 6,
+                }}
+                onClick={() => handleFilter("all")}
+            >
+                all
+            </button>
+            <button
+                style={{
+                    backgroundColor:
+                        activeFilter === "active" ? "black" : "lightgray",
+                    marginTop: 6,
+                }}
+                onClick={() => handleFilter("active")}
+            >
+                active
+            </button>
+            <button
+                style={{
+                    backgroundColor:
+                        activeFilter === "completed" ? "black" : "lightgray",
+                    marginTop: 6,
+                }}
+                onClick={() => handleFilter("completed")}
+            >
+                completed
+            </button>
+        </div>
     );
 };

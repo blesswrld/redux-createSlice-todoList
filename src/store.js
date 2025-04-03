@@ -1,6 +1,11 @@
-// import { createStore } from "redux";
-import { nanoid, createSlice, configureStore } from "@reduxjs/toolkit";
-import logger from "redux-logger";
+import {
+    nanoid,
+    createSlice,
+    configureStore,
+    createAction,
+} from "@reduxjs/toolkit";
+
+export const resetToDefault = createAction("root/reset-app");
 
 const todoSlice = createSlice({
     name: "@@todos",
@@ -28,35 +33,52 @@ const todoSlice = createSlice({
             todo.completed = !todo.completed;
         },
     },
+    extraReducers: (builder) => {
+        builder.addCase(resetToDefault, () => {
+            return [];
+        });
+    },
 });
 
-// пример с использованием createSlice для ДЗ
+const filterSlice = createSlice({
+    name: "filter",
+    initialState: "all",
+    reducers: {
+        setFilter: (_, action) => {
+            return action.payload;
+        },
+    },
+    extraReducers: (builder) => {
+        builder.addCase(resetToDefault, () => {
+            return "all";
+        });
+    },
+});
 
-// const counterSlice = createSlice({
-//     name: "@@counter",
-//     initialState: { value: 0 },
-//     reducers: {
-//         increment(state) {
-//             state.value++;
-//         },
-//         decrement(state) {
-//             state.value--;
-//         },
-//     },
-// });
-
-// export const { increment, decrement } = counterSlice.actions;
-
+export const { setFilter } = filterSlice.actions;
 export const { addTodo, removeTodo, toggleTodo } = todoSlice.actions;
 
 export const store = configureStore({
-    reducer: todoSlice.reducer,
-    // reducer: {
-    //     todos: todoSlice.reducer,
-    // },
-    // включаем расширение для redux devtools
+    reducer: {
+        todos: todoSlice.reducer,
+        filter: filterSlice.reducer,
+    },
     devTools: true,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
-    // preloadedState: [{ id: 1, title: "Redux", completed: true }],
-    // enhancers: [],
 });
+
+export const selectVisibleTodos = (state, filter) => {
+    switch (filter) {
+        case "all": {
+            return state.todos;
+        }
+        case "active": {
+            return state.todos.filter((todo) => !todo.completed);
+        }
+        case "completed": {
+            return state.todos.filter((todo) => todo.completed);
+        }
+        default: {
+            return state.todos;
+        }
+    }
+};
